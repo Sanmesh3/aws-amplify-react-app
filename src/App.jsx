@@ -37,11 +37,9 @@ function App() {
   var [feedToDBAudioPath, setFeedToDBAudioPath] = useState("");
   const [convertedFileData, setConvertedFileData] = useState({});
   var [currentUserName, setCurrentUserName] = useState("");
-  // const [deleteFileData, setDeleteFileData] = useState({});
-  // var [deleteOwner, setDeleteOwner] = useState("");
+  var [convertedOwner, setConvertedOwner] = useState("");
+
   
-
-
   const AddUserFile = ({onUpload}) => {
 
     const [userFileData, setUserFileData] = useState({});
@@ -111,17 +109,31 @@ function App() {
   };
 
 
-  const convertedFileToDB = async () => {
+  const convertedFileToDB = async (feedToDBAudioPath) => {
     alert('File has been converted!');
-
     try {
+      const authResponse1 = Auth.currentAuthenticatedUser();
+      // console.log("User Info:", authResponse);
+      const fullData1 = await authResponse1;
+      const username1 = fullData1.username;
+      // console.log("UName Inside Function:", username1);
+      convertedOwner = username1;
+      console.log("Converted file Owner: ", convertedOwner);
+
+
       convertedFileData.title1 = "Converted File";
       convertedFileData.description1 = "Just Converted";
-      convertedFileData.owner1 = `${currentUserName}`;
+      convertedFileData.owner1 = `${convertedOwner}`;
 
       const { title1, description1, owner1 } = convertedFileData;
 
-      const { key } = feedToDBAudioPath;
+      console.log("Inside DB Fill Fun: ", feedToDBAudioPath);
+      const key = feedToDBAudioPath;
+      console.log("Key to Converted File: ", key);
+
+      console.log("Title to Converted File: ", title1);
+      console.log("Desc to Converted File: ", description1);
+      console.log("Owner to Converted File: ", owner1);
 
       const createConvertedFileInput = {
         id: uuid(),
@@ -217,11 +229,6 @@ function App() {
     console.log("GET Status: ", status);
     console.log("GET Audio File: ", audioFile);
 
-                                                                // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
-                                                                // feedToDBAudioPath = def.slice(-40, );
-    const feedToDBAudioPath = audioFile.slice(-40, );
-    console.log("Feed To DB Audio FilePath", feedToDBAudioPath);
-
     if (statusCode === 400){
       console.log("Translate Operation Failed!");
       alert('Operation Failed! Please try again after sometime..');
@@ -229,8 +236,15 @@ function App() {
       console.log("Request in progress!");
       alert('Almost done! Wait a sec..');
       setTimeout(triggerGETRequest, 10000);
-    }else if (statusCode === 200){
-      convertedFileToDB();
+    }
+
+                                                                    // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
+                                                                // feedToDBAudioPath = def.slice(-40, );
+    const feedToDBAudioPath = audioFile.slice(-40, );
+    console.log("Feed To DB Audio FilePath", feedToDBAudioPath);
+
+    if (statusCode === 200){
+      convertedFileToDB(feedToDBAudioPath);
     }
 
   }
@@ -270,7 +284,7 @@ function App() {
       console.log("Arn for GET", inputForGet);
   
 
-      setTimeout(triggerGETRequest, 1000);
+      setTimeout(triggerGETRequest, 40000);
 
     } catch (error) {
       console.log('Error in POST request', error);
