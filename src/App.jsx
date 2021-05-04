@@ -68,6 +68,8 @@ function App() {
         
         setFilePath(key);
 
+        console.log("User File Upload Key:", key);
+
         const createUserFileInput = {
           // id: `${fileOwner}`,
           id: uuid(),
@@ -143,13 +145,16 @@ function App() {
         filePath: key
       }
 
-      await API.graphql(graphqlOperation(createUserFile, {input: createConvertedFileInput}))
+      console.log("Reached Here:", createConvertedFileInput);
+
+
+      await API.graphql(graphqlOperation(createUserFile, {input: createConvertedFileInput}));
       console.log('Converted file is now in DB!');
 
       fetchUserFiles();
 
     } catch (error) {
-      console.log('Error assigning converted file to DB', error);
+      console.log('Error inserting converted file to DB', error);
     }
   }
 
@@ -232,6 +237,7 @@ function App() {
     if (statusCode === 400){
       console.log("Translate Operation Failed!");
       alert('Operation Failed! Please try again after sometime..');
+      return;
     } else if (statusCode === 202){
       console.log("Request in progress!");
       alert('Almost done! Wait a sec..');
@@ -253,8 +259,8 @@ function App() {
     e.preventDefault();
     try {
       console.log('Reached Translator');
-      console.log(sourceLang);
-      console.log(destinationLang);
+      console.log("Selected source language: ",sourceLang);
+      console.log("Selected destination language: ",destinationLang);
       console.log("Uploaded FileName: ", filePath);
 
       let options = {
