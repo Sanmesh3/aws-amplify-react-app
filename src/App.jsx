@@ -220,9 +220,9 @@ function App() {
     }
 
 
-                                                                var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
-                                                                feedToDBAudioPath = def.slice(-40, );
-    // const feedToDBAudioPath = audioFile.slice(-40, );
+                                                                // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
+                                                                // feedToDBAudioPath = def.slice(-40, );
+    const feedToDBAudioPath = audioFile.slice(-40, );
     console.log("Feed To DB Audio Path", feedToDBAudioPath);
 
     console.log("GET Status Code: ", statusCode);
@@ -260,9 +260,9 @@ function App() {
       // console.log("POST Full Data: ", fullData);
       console.log("POST Arn: ", executionArn);
 
-                                                        var abc = "arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:052735e0-bbc0-424f-9316-56b530c70f2b";
-                                                        inputForGet = abc.slice(-36, );
-      // inputForGet = executionArn.slice(-36, );
+                                                        // var abc = "arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:052735e0-bbc0-424f-9316-56b530c70f2b";
+                                                        // inputForGet = abc.slice(-36, );
+      inputForGet = executionArn.slice(-36, );
       console.log("Arn for GET", inputForGet);
   
 
