@@ -201,8 +201,8 @@ function App() {
 
   const triggerGETRequest = async () => {
 
-    // const getResponse = await axios.get(`https://gbvv9l173k.execute-api.eu-west-1.amazonaws.com/alpha/execution?executionStateArn=arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:${inputForGet}`);
-    const getResponse = await axios.get('http://ptsv2.com/t/jlsx9-1620054951/post');
+    const getResponse = await axios.get(`https://gbvv9l173k.execute-api.eu-west-1.amazonaws.com/alpha/execution?executionStateArn=arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:${inputForGet}`);
+    // const getResponse = await axios.get('http://ptsv2.com/t/jlsx9-1620054951/post');
     const fullData = await getResponse;
     const statusCode = fullData.statusCode;
     const status = fullData.status;
@@ -253,8 +253,8 @@ function App() {
 
       console.log("Query", graphql_query1)
  
-      // const postResponse = await axios.post('https://9kbrk4j6m4.execute-api.eu-west-1.amazonaws.com/alpha/execution', graphql_query1, options);
-      const postResponse = await axios.post('https://httpbin.org/post', graphql_query1, options);
+      const postResponse = await axios.post('https://9kbrk4j6m4.execute-api.eu-west-1.amazonaws.com/alpha/execution', graphql_query1, options);
+      // const postResponse = await axios.post('https://httpbin.org/post', graphql_query1, options);
       const fullData = await postResponse;
       const executionArn = fullData.executionArn;
 
