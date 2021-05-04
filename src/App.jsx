@@ -201,7 +201,7 @@ function App() {
 
   const triggerGETRequest = async () => {
 
-    const getResponse = await axios.get(`https://gbvv9l173k.execute-api.eu-west-1.amazonaws.com/alpha/execution?executionStateArn=arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:${inputForGet}`);
+    const getResponse = axios.get(`https://gbvv9l173k.execute-api.eu-west-1.amazonaws.com/alpha/execution?executionStateArn=arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:${inputForGet}`);
     // const getResponse = await axios.get('http://ptsv2.com/t/jlsx9-1620054951/post');
     const fullData = await getResponse;
     const statusCode = fullData.statusCode;
@@ -214,7 +214,7 @@ function App() {
     } else if (statusCode === 202){
       console.log("Request in progress!");
       alert('Almost done! Wait a sec..');
-      setTimeout(triggerGETRequest, 100);
+      setTimeout(triggerGETRequest, 10000);
     }else if (statusCode === 200){
       convertedFileToDB();
     }
@@ -252,12 +252,12 @@ function App() {
 
       console.log("Query", graphql_query1)
  
-      const postResponse = await axios.post('https://9kbrk4j6m4.execute-api.eu-west-1.amazonaws.com/alpha/execution', graphql_query1, options);
+      const postResponse = axios.post('https://9kbrk4j6m4.execute-api.eu-west-1.amazonaws.com/alpha/execution', graphql_query1, options);
       // const postResponse = await axios.post('https://httpbin.org/post', graphql_query1, options);
       const fullData = await postResponse;
       const executionArn = fullData.executionArn;
 
-      // console.log("POST Full Data: ", fullData);
+      console.log("POST Full Data: ", fullData);
       console.log("POST Arn: ", executionArn);
 
                                                         // var abc = "arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:052735e0-bbc0-424f-9316-56b530c70f2b";
@@ -266,7 +266,7 @@ function App() {
       console.log("Arn for GET", inputForGet);
   
 
-      setTimeout(triggerGETRequest, 10000);
+      setTimeout(triggerGETRequest, 40000);
 
     } catch (error) {
       console.log('Error in POST request', error);
@@ -346,7 +346,7 @@ function App() {
           {
             showAddUserFile ? (
               <AddUserFile onUpload={() => {
-                alert("File upload limited to 1 file per user");
+                alert("Note: File upload limited to 1 file per login.");
                 setShowAddNewUserFile(false)
                 fetchUserFiles();
               }} />
