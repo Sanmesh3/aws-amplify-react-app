@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "t3API",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authamplifyreactapp4d399328",
+      "Outputs.UserPoolId"
+    ]
+  }
+}
