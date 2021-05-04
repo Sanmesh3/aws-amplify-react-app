@@ -201,12 +201,26 @@ function App() {
 
   const triggerGETRequest = async () => {
 
-    const getResponse = axios.get(`https://gbvv9l173k.execute-api.eu-west-1.amazonaws.com/alpha/execution?executionStateArn=arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:${inputForGet}`);
+    const getQuery = `https://gbvv9l173k.execute-api.eu-west-1.amazonaws.com/alpha/execution?executionStateArn=arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:${inputForGet}`
+
+    console.log("GET Query", getQuery);
+
+    const getResponse = axios.get(getQuery);
     // const getResponse = await axios.get('http://ptsv2.com/t/jlsx9-1620054951/post');
     const fullData = await getResponse;
-    const statusCode = fullData.statusCode;
-    const status = fullData.status;
-    const audioFile = fullData.audioFile;
+    console.log("GET Full Data: ", fullData);
+    const statusCode = fullData.data.statusCode;
+    const status = fullData.data.status;
+    const audioFile = fullData.data.audioFile;
+
+    console.log("GET Status Code: ", statusCode);
+    console.log("GET Status: ", status);
+    console.log("GET Audio File: ", audioFile);
+
+                                                                // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
+                                                                // feedToDBAudioPath = def.slice(-40, );
+    const feedToDBAudioPath = audioFile.slice(-40, );
+    console.log("Feed To DB Audio FilePath", feedToDBAudioPath);
 
     if (statusCode === 400){
       console.log("Translate Operation Failed!");
@@ -219,17 +233,7 @@ function App() {
       convertedFileToDB();
     }
 
-
-                                                                // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
-                                                                // feedToDBAudioPath = def.slice(-40, );
-    const feedToDBAudioPath = audioFile.slice(-40, );
-    console.log("Feed To DB Audio Path", feedToDBAudioPath);
-
-    console.log("GET Status Code: ", statusCode);
-    console.log("GET Status: ", status);
-    console.log("GET Audio File: ", audioFile);
-
-    }
+  }
 
   const translator = async (e) => {
     e.preventDefault();
@@ -250,23 +254,23 @@ function App() {
         "stateMachineArn": "arn:aws:states:eu-west-1:203527985016:stateMachine:cloud-state-machine"
       }`
 
-      console.log("Query", graphql_query1)
+      console.log("POST Query", graphql_query1);
  
       const postResponse = axios.post('https://9kbrk4j6m4.execute-api.eu-west-1.amazonaws.com/alpha/execution', graphql_query1, options);
       // const postResponse = await axios.post('https://httpbin.org/post', graphql_query1, options);
       const fullData = await postResponse;
-      const executionArn = fullData.executionArn;
+      const executionArn = fullData.data.executionArn;
 
       console.log("POST Full Data: ", fullData);
       console.log("POST Arn: ", executionArn);
 
-                                                        // var abc = "arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:052735e0-bbc0-424f-9316-56b530c70f2b";
+                                                        // var abc = "arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:077b59fc-0d4f-72ad-aa24-ec74067a2bdc";
                                                         // inputForGet = abc.slice(-36, );
       inputForGet = executionArn.slice(-36, );
       console.log("Arn for GET", inputForGet);
   
 
-      setTimeout(triggerGETRequest, 40000);
+      setTimeout(triggerGETRequest, 1000);
 
     } catch (error) {
       console.log('Error in POST request', error);
