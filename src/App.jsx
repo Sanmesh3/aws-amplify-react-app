@@ -4,7 +4,7 @@ import Amplify, {API, graphqlOperation, Storage, Auth} from 'aws-amplify';
 import awsconfig from './aws-exports';
 import {AmplifySignOut, withAuthenticator} from '@aws-amplify/ui-react';
 import {listUserFiles} from './graphql/queries';
-import {createUserFile, deleteUserFile} from './graphql/mutations';
+import {createUserFile} from './graphql/mutations';
 
 import {useState, useEffect} from 'react';
 import ReactPlayer from 'react-player';
@@ -20,8 +20,6 @@ import PublishIcon from '@material-ui/icons/Publish';
 
 import axios from 'axios';
 
-// import AWS from 'aws-sdk';
-
 
 Amplify.configure(awsconfig);
 
@@ -33,19 +31,17 @@ function App() {
   const [sourceLang, setSourceLang] = useState('');
   const [destinationLang, setDestinationLang] = useState('');
   const [filePath, setFilePath] = useState(null);
-  var [inputForGet, setInputForGet] = useState("");
-  var [feedToDBAudioPath, setFeedToDBAudioPath] = useState("");
-  const [convertedFileData, setConvertedFileData] = useState({});
-  var [currentUserName, setCurrentUserName] = useState("");
-  var [convertedOwner, setConvertedOwner] = useState("");
+  var [inputForGet] = useState("");
+  const [convertedFileData] = useState({});
+  var [currentUserName] = useState("");
+  var [convertedOwner] = useState("");
 
   
   const AddUserFile = ({onUpload}) => {
 
-    const [userFileData, setUserFileData] = useState({});
     const [mp3Data, setMp3Data] = useState();
     const [currUserFileData, setCurrUserFileData] = useState({});
-    var [fileOwner, setFileOwner] = useState("");
+    var [fileOwner] = useState("");
   
   
     const uploadUserFile = async () => {
@@ -161,7 +157,7 @@ function App() {
 
   useEffect(() => {
     fetchUserFiles();
-  }, []);
+  });
 
   const toggleUserFile = async idx => {
     if (userFilePlaying === idx) {
@@ -242,6 +238,7 @@ function App() {
       console.log("Request in progress!");
       alert('Almost done! Wait a sec..');
       setTimeout(triggerGETRequest, 10000);
+      return;
     }
 
                                                                     // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
@@ -386,17 +383,47 @@ function App() {
             <label htmlFor="languageSelection"><h3>Choose Source and Destination Language</h3></label><br></br>
             <select name="source" id="source" required onChange={(e) => setSourceLang(e.target.value)}>
               <option disabled="disabled" selected>Choose Source Language</option>
+              <option value="Arabic">Arabic</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Dutch">Dutch</option>
+              <option value="English, British">English, British</option>
+              <option value="English, Indian">English, Indian</option>
               <option value="English, US">English, US</option>
+              <option value="English, Australian">English, Australian</option>
               <option value="Spanish, European">Spanish, European</option>
-              <option value="German">German</option>
+              <option value="Spanish, Mexican">Spanish, European</option>
+              <option value="French">French</option>
+              <option value="French, Canadian">French, Canadian</option>
               <option value="Hindi">Hindi</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Japanese">Japanese</option>
+              <option value="Korean">Korean</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Russian">Russian</option>
+              <option value="Turkish">Turkish</option>
             </select>
             <select name="destination" id="destination" required onChange={(e) => setDestinationLang(e.target.value)}>
               <option disabled="disabled" selected>Choose Destination Language</option>
+              <option value="Arabic">Arabic</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Dutch">Dutch</option>
+              <option value="English, British">English, British</option>
+              <option value="English, Indian">English, Indian</option>
               <option value="English, US">English, US</option>
+              <option value="English, Australian">English, Australian</option>
               <option value="Spanish, European">Spanish, European</option>
-              <option value="German">German</option>
+              <option value="Spanish, Mexican">Spanish, European</option>
+              <option value="French">French</option>
+              <option value="French, Canadian">French, Canadian</option>
               <option value="Hindi">Hindi</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Japanese">Japanese</option>
+              <option value="Korean">Korean</option>
+              <option value="Portuguese">Portuguese</option>
+              <option value="Russian">Russian</option>
+              <option value="Turkish">Turkish</option>
             </select><br/><br/>
             <button>Submit</button>
           </form>
