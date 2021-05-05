@@ -157,7 +157,7 @@ function App() {
 
   useEffect(() => {
     fetchUserFiles();
-  });
+  }, []);
 
   const toggleUserFile = async idx => {
     if (userFilePlaying === idx) {
