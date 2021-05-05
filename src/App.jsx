@@ -1,3 +1,5 @@
+// SJSU CS 218 Spring 2021 TEAM4
+
 import React from 'react';
 import './App.css';
 import Amplify, {API, graphqlOperation, Storage, Auth} from 'aws-amplify';
