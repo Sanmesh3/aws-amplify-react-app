@@ -33,10 +33,11 @@ function App() {
   const [sourceLang, setSourceLang] = useState('');
   const [destinationLang, setDestinationLang] = useState('');
   const [filePath, setFilePath] = useState(null);
-  var [inputForGet] = useState("");
   const [convertedFileData] = useState({});
+  const [fileTitle, setFileTitle] = useState("");
   var [currentUserName] = useState("");
   var [convertedOwner] = useState("");
+  var inputForGet = "";
 
   
   const AddUserFile = ({onUpload}) => {
@@ -61,12 +62,14 @@ function App() {
         // setCurrUserFileData({ ...currUserFileData, owner: `${currentUserName}`});
         currUserFileData.owner = `${fileOwner}`;
         const { title, description, owner } = currUserFileData;
+
+        setFileTitle(title);
   
         const { key } = await Storage.put(`${uuid()}.mp3`, mp3Data, {contentType: 'audio/mp3' });
         
         setFilePath(key);
 
-        console.log("User File Upload Key:", key);
+        // console.log("User File Upload Key:", key);
 
         const createUserFileInput = {
           // id: `${fileOwner}`,
@@ -77,7 +80,7 @@ function App() {
           filePath: key
         }
         await API.graphql(graphqlOperation(createUserFile, {input: createUserFileInput}))
-        console.log('File uploaded successfully!');
+        console.log('User file uploaded successfully!');
         onUpload();
       } catch (error) {
         console.log('Error in uploading new File', error);
@@ -92,10 +95,6 @@ function App() {
           value={currUserFileData.title} 
           onChange={e => setCurrUserFileData({ ...currUserFileData, title: e.target.value })} 
         />
-        {/* <TextField label="Owner" 
-          value={userFileData.owner} 
-          onChange={e => setUserFileData({ ...userFileData, owner: e.target.value })} 
-        /> */}
         <TextField label="Description" 
           value={currUserFileData.description} 
           onChange={e => setCurrUserFileData({ ...currUserFileData, description: e.target.value })} 
@@ -110,7 +109,6 @@ function App() {
 
 
   const convertedFileToDB = async (feedToDBAudioPath) => {
-    alert('File has been converted!');
     try {
       const authResponse1 = Auth.currentAuthenticatedUser();
       // console.log("User Info:", authResponse);
@@ -118,36 +116,35 @@ function App() {
       const username1 = fullData1.username;
       // console.log("UName Inside Function:", username1);
       convertedOwner = username1;
-      console.log("Converted file Owner: ", convertedOwner);
+      // console.log("Converted file Owner: ", convertedOwner);
 
+      // convertedFileData.title = `File: ${uuid()}`;
+      convertedFileData.title = `${fileTitle}: ${sourceLang} To ${destinationLang}`;
+      convertedFileData.description = "Converted";
+      convertedFileData.owner = `${convertedOwner}`;
 
-      convertedFileData.title1 = "Converted File";
-      convertedFileData.description1 = "Just Converted";
-      convertedFileData.owner1 = `${convertedOwner}`;
+      const { title, description, owner } = convertedFileData;
 
-      const { title1, description1, owner1 } = convertedFileData;
-
-      console.log("Inside DB Fill Fun: ", feedToDBAudioPath);
+      // console.log("Inside DB Fill Fun: ", feedToDBAudioPath);
       const key = feedToDBAudioPath;
-      console.log("Key to Converted File: ", key);
-
-      console.log("Title to Converted File: ", title1);
-      console.log("Desc to Converted File: ", description1);
-      console.log("Owner to Converted File: ", owner1);
+      // console.log("Key to Converted File: ", key);
+      // console.log("Title to Converted File: ", title);
+      // console.log("Desc to Converted File: ", description);
+      // console.log("Owner to Converted File: ", owner);
 
       const createConvertedFileInput = {
         id: uuid(),
-        title1,
-        description1,
-        owner1,
+        title,
+        description,
+        owner,
         filePath: key
       }
 
-      console.log("Reached Here:", createConvertedFileInput);
+      console.log("Inserting in DynamoDB:", createConvertedFileInput);
 
 
       await API.graphql(graphqlOperation(createUserFile, {input: createConvertedFileInput}));
-      console.log('Converted file is now in DB!');
+      console.log('Converted file uploaded successfully!');
 
       fetchUserFiles();
 
@@ -171,12 +168,12 @@ function App() {
     const userFilePath = userFiles[idx].filePath;
     try {
         const fileAccessURL = await Storage.get(userFilePath, { expires: 60 })
-        console.log('Access URL: ', fileAccessURL);
+        // console.log('Access URL: ', fileAccessURL);
         setUserFilePlaying(idx);
         setAudioURL(fileAccessURL);
         return;
     } catch (error) {
-      console.log('Error accessing userFiles from S3', error);
+      console.log('Error accessing User file from S3', error);
       setAudioURL('');
       setUserFilePlaying('');
     }
@@ -192,26 +189,18 @@ function App() {
           const username = fullData.username;
           // console.log("Just Username:", username);
           currentUserName = username;
-          console.log("Current Username: ", currentUserName);
+          // console.log("Current Username: ", currentUserName);
 
           
           // const userFileData = await API.graphql(graphqlOperation(listUserFiles));
           const userFileData = await API.graphql(graphqlOperation(listUserFiles, {filter: {owner: {eq: `${currentUserName}`}}}));
           const userFileList = userFileData.data.listUserFiles.items;
-          console.log('User File List', userFileData);
+          console.log('Retrieved User Files: ', userFileData);
           setUserFiles(userFileList);
       } catch (error) {
           console.log('Error on fetching userFiles', error);
       }
   };
-
-
-  const createAlert = () => {
-    alert("Request Submitted to Server");
-    alert("Please wait a few moments to view results");
-
-    setTimeout(triggerGETRequest, 5000);
-  }
 
 
   const triggerGETRequest = async () => {
@@ -221,32 +210,28 @@ function App() {
     console.log("GET Query", getQuery);
 
     const getResponse = axios.get(getQuery);
-    // const getResponse = await axios.get('http://ptsv2.com/t/jlsx9-1620054951/post');
     const fullData = await getResponse;
-    console.log("GET Full Data: ", fullData);
+    console.log("GET Response Data: ", fullData);
     const statusCode = fullData.data.statusCode;
     const status = fullData.data.status;
     const audioFile = fullData.data.audioFile;
 
     console.log("GET Status Code: ", statusCode);
     console.log("GET Status: ", status);
-    console.log("GET Audio File: ", audioFile);
+    // console.log("GET Audio File: ", audioFile);
 
     if (statusCode === 400){
       console.log("Translate Operation Failed!");
-      alert('Operation Failed! Please try again after sometime..');
+      alert('Operation Failed! Please try again after sometime...');
       return;
     } else if (statusCode === 202){
-      console.log("Request in progress!");
-      alert('Almost done! Wait a sec..');
+      console.log("Translation still in progress!");
       setTimeout(triggerGETRequest, 10000);
       return;
     }
 
-                                                                    // var def = "s3://userfile-storage190018-dev/public/5d0a42db-d8a4-4192-925d-b1369096fa47.mp3";
-                                                                // feedToDBAudioPath = def.slice(-40, );
     const feedToDBAudioPath = audioFile.slice(-40, );
-    console.log("Feed To DB Audio FilePath", feedToDBAudioPath);
+    console.log("Converted Audio S3 Path: ", feedToDBAudioPath);
 
     if (statusCode === 200){
       convertedFileToDB(feedToDBAudioPath);
@@ -257,9 +242,8 @@ function App() {
   const translator = async (e) => {
     e.preventDefault();
     try {
-      console.log('Reached Translator');
-      console.log("Selected source language: ",sourceLang);
-      console.log("Selected destination language: ",destinationLang);
+      console.log("Selected Source Language: ", sourceLang);
+      console.log("Selected Target Language: ", destinationLang);
       console.log("Uploaded FileName: ", filePath);
 
       let options = {
@@ -276,63 +260,28 @@ function App() {
       console.log("POST Query", graphql_query1);
  
       const postResponse = axios.post('https://9kbrk4j6m4.execute-api.eu-west-1.amazonaws.com/alpha/execution', graphql_query1, options);
-      // const postResponse = await axios.post('https://httpbin.org/post', graphql_query1, options);
       const fullData = await postResponse;
       const executionArn = fullData.data.executionArn;
 
-      console.log("POST Full Data: ", fullData);
+      console.log("POST Response Data: ", fullData);
       console.log("POST Arn: ", executionArn);
 
-                                                        // var abc = "arn:aws:states:eu-west-1:203527985016:execution:cloud-state-machine:077b59fc-0d4f-72ad-aa24-ec74067a2bdc";
-                                                        // inputForGet = abc.slice(-36, );
       inputForGet = executionArn.slice(-36, );
-      console.log("Arn for GET", inputForGet);
+      console.log("Arn for GET: ", inputForGet);
   
 
-      setTimeout(triggerGETRequest, 40000);
+      setTimeout(triggerGETRequest, 20000);
 
     } catch (error) {
       console.log('Error in POST request', error);
     }
   }
 
-  const dump = async () => {
-    try {
-      console.log("Reached DUMP");
-    } catch (error) {
-      console.log('Error in DUMP', error);
-    }
-  }
-
-  function myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
-    dump();
-  }
   
-  // Close the dropdown menu if the user clicks outside of it
-  window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
-      }
-    }
-  }
-
-
   return (
     <div className="App">
       <header className="App-header">
-        <div className="dropdown">
-          <button onClick={myFunction} className="dropbtn">Exit</button>
-          <div id="myDropdown" className="dropdown-content">
-            <p><AmplifySignOut /></p>
-          </div>
-        </div>
+        <button className="signOut"><AmplifySignOut /></button>
         <h2>Audio Translator App</h2>
       </header>
       <main>
@@ -347,7 +296,7 @@ function App() {
                   </IconButton>
                   <div>
                     <div className="userFileTitle">{userFile.title}</div>
-                    <div className="userFileOwner">{userFile.owner}</div>
+                    {/* <div className="userFileOwner">{userFile.owner}</div> */}
                   </div>
                   <div className="userFileDescription">{userFile.description}</div>
                 </div>
@@ -369,9 +318,9 @@ function App() {
           {
             showAddUserFile ? (
               <AddUserFile onUpload={() => {
-                alert("Note: File upload limited to 1 file per login.");
                 setShowAddNewUserFile(false)
                 fetchUserFiles();
+                // alert("Note: File upload limited to 1 file per login.");
               }} />
             ) : <IconButton onClick={() => setShowAddNewUserFile(true)}>
                   <AddIcon /> 
@@ -429,15 +378,10 @@ function App() {
             </select><br/><br/>
             <button>Submit</button>
           </form>
-        </div><br/><br/><br/><br/>
-        <div>
-          <button onClick={createAlert}>Check Status</button>
         </div>
-
       </footer>
     </div>
   );
 }
 
 export default withAuthenticator(App);
-
