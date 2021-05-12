@@ -17,8 +17,8 @@
   color: white;
 }
 .signOut {
-  position: fixed;
-  right: 25px;
+  position: relative;
+  right: -250px;
   vertical-align: middle;
   background-color: #FFA500;
 }
@@ -44,5 +44,12 @@
 
 .theAudioPlayer {
   display: flex;
+  justify-content: center;
+}
+
+.transcript {
+  width: 700px;
+  height: 200px;
+  overflow: scroll;
   justify-content: center;
 }
