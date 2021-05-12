@@ -38,6 +38,8 @@ function App() {
   var [currentUserName] = useState("");
   var [convertedOwner] = useState("");
   var inputForGet = "";
+  var transcript = "...";
+  var element  = document.getElementById("trans");
 
   
   const AddUserFile = ({onUpload}) => {
@@ -108,6 +110,22 @@ function App() {
   };
 
 
+  const showFile = async (feedToDBAudioPath) => {
+
+    const textFilePath = feedToDBAudioPath.slice(0, -3) + "txt";
+    console.log("Text File Path: ", textFilePath);
+
+    const textFileAccessURL = await Storage.get(textFilePath);
+
+    const textResponse = axios.get(textFileAccessURL);
+    const fullTextData = await textResponse;
+    transcript = await fullTextData.data;
+    console.log("Text Response Data: ", fullTextData);
+    console.log("Transcript: ", transcript);
+    element.innerHTML = transcript;
+  };
+
+
   const convertedFileToDB = async (feedToDBAudioPath) => {
     try {
       const authResponse1 = Auth.currentAuthenticatedUser();
@@ -146,7 +164,9 @@ function App() {
       await API.graphql(graphqlOperation(createUserFile, {input: createConvertedFileInput}));
       console.log('Converted file uploaded successfully!');
 
+      showFile(feedToDBAudioPath);
       fetchUserFiles();
+      alert(`Translation from ${sourceLang} to ${destinationLang} complete!`);
 
     } catch (error) {
       console.log('Error inserting converted file to DB', error);
@@ -167,6 +187,7 @@ function App() {
 
     const userFilePath = userFiles[idx].filePath;
     try {
+        // console.log("User File Path: ", userFilePath);
         const fileAccessURL = await Storage.get(userFilePath, { expires: 60 })
         // console.log('Access URL: ', fileAccessURL);
         setUserFilePlaying(idx);
@@ -226,6 +247,7 @@ function App() {
       return;
     } else if (statusCode === 202){
       console.log("Translation still in progress!");
+      alert("Translation in progress..");
       setTimeout(triggerGETRequest, 10000);
       return;
     }
@@ -245,6 +267,19 @@ function App() {
       console.log("Selected Source Language: ", sourceLang);
       console.log("Selected Target Language: ", destinationLang);
       console.log("Uploaded FileName: ", filePath);
+
+      if (filePath === null){
+        alert('Operation Failed! Please upload a file for conversion...');
+        return;
+      }
+      if (sourceLang === ''){
+        alert('Operation Failed! Please select source language for conversion...');
+        return;
+      }
+      if (destinationLang === ''){
+        alert('Operation Failed! Please select destination language for conversion...');
+        return;
+      }
 
       let options = {
         headers: {
@@ -281,8 +316,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <button className="signOut"><AmplifySignOut /></button>
         <h2>Audio Translator App</h2>
+        <button className="signOut"><AmplifySignOut /></button>
       </header>
       <main>
         <span><h3>Click + to add new file</h3></span>
@@ -296,7 +331,6 @@ function App() {
                   </IconButton>
                   <div>
                     <div className="userFileTitle">{userFile.title}</div>
-                    {/* <div className="userFileOwner">{userFile.owner}</div> */}
                   </div>
                   <div className="userFileDescription">{userFile.description}</div>
                 </div>
@@ -320,10 +354,10 @@ function App() {
               <AddUserFile onUpload={() => {
                 setShowAddNewUserFile(false)
                 fetchUserFiles();
-                // alert("Note: File upload limited to 1 file per login.");
+                alert("File uploaded successfully!");
               }} />
             ) : <IconButton onClick={() => setShowAddNewUserFile(true)}>
-                  <AddIcon /> 
+                  <AddIcon />
                 </IconButton>
           }
         </div>
@@ -342,7 +376,7 @@ function App() {
               <option value="English, US">English, US</option>
               <option value="English, Australian">English, Australian</option>
               <option value="Spanish, European">Spanish, European</option>
-              <option value="Spanish, Mexican">Spanish, European</option>
+              <option value="Spanish, Mexican">Spanish, Mexican</option>
               <option value="French">French</option>
               <option value="French, Canadian">French, Canadian</option>
               <option value="Hindi">Hindi</option>
@@ -364,7 +398,7 @@ function App() {
               <option value="English, US">English, US</option>
               <option value="English, Australian">English, Australian</option>
               <option value="Spanish, European">Spanish, European</option>
-              <option value="Spanish, Mexican">Spanish, European</option>
+              <option value="Spanish, Mexican">Spanish, Mexican</option>
               <option value="French">French</option>
               <option value="French, Canadian">French, Canadian</option>
               <option value="Hindi">Hindi</option>
@@ -378,6 +412,10 @@ function App() {
             </select><br/><br/>
             <button>Submit</button>
           </form>
+        </div>
+
+        <div><br/><br/>
+          <output className="transcript" id="trans">...</output>
         </div>
       </footer>
     </div>
