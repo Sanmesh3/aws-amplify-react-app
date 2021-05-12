@@ -51,4 +51,5 @@
   width: 700px;
   height: 200px;
   overflow: scroll;
+  justify-content: center;
 }
