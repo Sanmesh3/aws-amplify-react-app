@@ -304,7 +304,7 @@ function App() {
       inputForGet = executionArn.slice(-36, );
       console.log("Arn for GET: ", inputForGet);
   
-
+      alert("Request submitted!");
       setTimeout(triggerGETRequest, 20000);
 
     } catch (error) {
